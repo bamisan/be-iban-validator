@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Iban;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Iban\IbanStoreRequest;
 use App\Models\Iban;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Iban\IbanStoreRequest;
 
 class IbanController extends Controller
 {
@@ -22,6 +22,7 @@ class IbanController extends Controller
         }
 
         try {
+
             $ibans = Iban::with('user')->get();
 
             return $this->sendResponse($ibans, 'IBANs fetched successfully.');
@@ -53,8 +54,8 @@ class IbanController extends Controller
             
         } catch (\Exception $e) {
 
-            Log::error('fetch failed: ' . $e->getMessage());
-            return $this->sendError('fetch failed due to a server error.', [], 500);
+            Log::error('store failed: ' . $e->getMessage());
+            return $this->sendError('store failed due to a server error.', [], 500);
 
         }
 
