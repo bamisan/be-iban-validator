@@ -19,20 +19,20 @@ class InitialUserSeeder extends Seeder
         $ascenticUsers = [
             [
                 'name' => 'Admin',
-                'email' => 'admin@gamil.com',
+                'email' => 'admin@gmail.com',
                 'is_admin' => true
             ],
             [
                 'name' => 'Kolitha Perera',
-                'email' => 'KP@gamil.com',
+                'email' => 'KP@gmail.com',
             ],
             [
                 'name' => 'Wasana Gallage',
-                'email' => 'WG@gamil.com',
+                'email' => 'WG@gmail.com',
             ],
             [
                 'name' => 'Bamisan Sellathurai',
-                'email' => 'BS@gamil.com',
+                'email' => 'BS@gmail.com',
             ],
         ];
 

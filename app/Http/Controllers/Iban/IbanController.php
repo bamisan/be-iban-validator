@@ -14,7 +14,7 @@ class IbanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Check if the authenticated user is an admin
         if (!Auth::user()->is_admin) {
@@ -23,7 +23,9 @@ class IbanController extends Controller
 
         try {
 
-            $ibans = Iban::with('user')->get();
+            $perPage = $request->has('per_page') ? $request->input('per_page') :  10;
+
+            $ibans = Iban::with('user')->paginate($perPage);
 
             return $this->sendResponse($ibans, 'IBANs fetched successfully.');
 
