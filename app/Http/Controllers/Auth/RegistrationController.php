@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegistrationRequest;
-use Carbon\Carbon;
 
 class RegistrationController extends Controller
 {
@@ -14,20 +16,56 @@ class RegistrationController extends Controller
     {
             
         $data = $request->validated();
-
         $data['password'] = Hash::make($data['password']);
 
-        $user = User::create($data);
+        try {
 
-        $expiresAt = Carbon::now()->addMinutes(60);
+            $user = User::create($data);
 
-        $success['token'] = $user->createToken('be-iban-validator-app', ["*"], $expiresAt)->plainTextToken;
-        $success['name'] = $user->name;
+            $user = $user->fresh();
 
-        $user->markEmailAsVerified();
+            $success['token'] = $user->createToken('be-iban-validator-app')->plainTextToken;
+            $success['name'] = $user->name;
+            $success['is_admin'] = $user->is_admin;
 
-        return $this->sendResponse($success, 'User register successfully.');
+            $user->markEmailAsVerified();
 
+            return $this->sendResponse($success, 'User register successfully.');
+
+        } catch (\Exception $e) {
+
+            Log::error('Registration failed: ' . $e->getMessage());
+            return $this->sendError('Registration failed due to a server error.', [], 500);
+
+        }
+
+    }
+
+    public function login(LoginRequest $request)
+    {
+
+        $data = $request->validated();
+
+        if (!Auth::attempt(['email' => $data['email'], 'password' => $data['password']])) {
+            return $this->sendError('Invalid credentials.', ['error' => 'Unauthorised'], 401);
+        }
+
+        try {
+
+            $user = Auth::user();
+
+            $success['token'] = $user->createToken('be-iban-validator-app')->plainTextToken;
+            $success['name'] = $user->name;
+            $success['is_admin'] = $user->is_admin;        
+
+            return $this->sendResponse($success, 'User login successfully.');
+
+        } catch (\Exception $e) {
+
+            Log::error('Login failed: ' . $e->getMessage());
+            return $this->sendError('Login failed due to a server error.', [], 500);
+
+        }
     }
 
 }
